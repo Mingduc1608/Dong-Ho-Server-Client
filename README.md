@@ -64,7 +64,7 @@
 [![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/) 
 [![JDBC](https://img.shields.io/badge/JDBC%20Connector-CC0000?style=for-the-badge&logo=java&logoColor=white)](https://dev.mysql.com/downloads/connector/j/) 
 [![Eclipse](https://img.shields.io/badge/Eclipse-2C2255?style=for-the-badge&logo=eclipseide&logoColor=white)](https://www.eclipse.org/) 
-
+[![UDP](https://img.shields.io/badge/UDP%20Socket-00599C?style=for-the-badge&logo=socket.io&logoColor=white)](https://docs.oracle.com/javase/tutorial/networking/datagrams/) 
 
 
 
@@ -77,66 +77,80 @@
 🖥️ Giao diện Client
 ![Client GUI](docs/Client.png)
 
+🔄 Giao diện đồng hồ Đồng bộ hóa  
+![Sync](docs/Sync.png)
 
 📊 Bảng dữ liệu trong MySQL (sync_log)
 ![Runs Table](docs/TableMySQL.png)
 
+⏱️ Giao diện đồng hồ hẹn giờ  
+![TimerFrame](docs/TimerFrame.png)
 
-📂 Xuất file CSV
-![CSV Export](docs/udp_csv.png)
+👥 Giao diện khi hẹn giờ xong  
+![FrameClock](docs/FrameClock.png)
 
+⏰ Giao diện đồng hồ báo thức  
+![Alarm GUI](docs/Alarm.png)
+
+🕒 Giao diện đồng hồ bấm giờ  
+![StopClock](docs/StopClock.png)
 
 ## 4. Các bước cài đặt
 🔧 Bước 1. Chuẩn bị môi trường
 
-    Cài đặt JDK 8 hoặc 11 ☕.
+    Cài đặt JDK 8 hoặc 11.
 
-    Cài đặt MySQL 8.x + Workbench 🗄️.
+    Cài đặt MySQL 8.x + Workbench.
 
-    Tạo database udp_time
+    Tạo database clock_sync
 🗄️ Bước 2. Tạo bảng trong MySQL
 
 📦 Bước 3. Thêm thư viện JDBC
 
-    Tải mysql-connector-j-8.x.x.jar.
+    Tải mysql-connector-j-9.4.0.jar.
 
     Copy vào thư mục lib/ của project → Add to Build Path.
 ⚙️ Bước 4. Cấu hình kết nối
 
-    Trong DbHelper.java:
+    Trong Database:
 
-    public class DbHelper {
-        private static final String URL = "jdbc:mysql://localhost:3306/udp_time";
-        private static final String USER = "root";
-        private static final String PASS = "your_password";
+    private void startServer() {
+     appendLog("[Start] Server Startting...");
+     int port = 9876; 
+     // DB params - hãy chỉnh theo máy bạn
+     String url = "jdbc:mysql://localhost:3306/clock_sync?useSSL=false&serverTimezone=UTC";
+     String user = "root";
+     String pass = "my_password";
 
-        public static Connection open() throws Exception {
-            return DriverManager.getConnection(URL, USER, PASS);
-        }
+     server = new UDPServer(port, url, user, pass, this::appendLog);
+     server.start();
+     btnStart.setEnabled(false);
+     btnStop.setEnabled(true);
     }
 
 ▶️ Bước 5. Chạy hệ thống
 
-    Chạy TimeServerGUI.java → nhấn Start Server 🟢.
+👉  Chạy ServerApp.java → nhấn Start Server.
 
-    Chạy TimeClientGUI.java → nhập IP Server → nhấn Run 🚀.
+👉  Chạy ClientApp.java → nhấn Đồng bộ hóa → nhấn Run.
 
-    Quan sát Bảng kết quả, Biểu đồ, Đồng hồ.
+👉  Quan sát Bảng kết quả đồng bộ, Bảng thống kê, Đồng hồ.
 
-    Kiểm tra dữ liệu trong MySQL Workbench:
+👉  Kiểm tra dữ liệu trong MySQL Workbench:
+        SELECT * FROM clock_sync ORDER BY id DESC;
+        
+👉  Ở giao diện ClientApp → nhấn Báo thức / Hẹn Giờ / Bấm giờ      
 
-        SELECT * FROM runs ORDER BY id DESC;
-        SELECT * FROM samples WHERE run_id = <id>;
-## 5. Liên hệ(cá nhân)
 
 Contact me:
 
-
-    Nguyễn Thuý Hằng CNTT 16-04
+    Nguyễn Minh Đức CNTT 16-01
 
     Khoa: Công nghệ thông tin - Trường Đại học Đại Nam 
 
-    email: nguyenthuyhang.qc2004@gmail.com
+    SĐT: 0372334278
+
+    Email: duc1608204@gmail.com
 
 
     
