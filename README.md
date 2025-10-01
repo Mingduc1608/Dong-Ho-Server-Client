@@ -58,8 +58,6 @@
 ## 2. Công nghệ sử dụng
 
 [![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/technologies/javase-downloads.html) 
-[![TCP](https://img.shields.io/badge/TCP-0088CC?style=for-the-badge&logo=socketdotio&logoColor=white)](https://en.wikipedia.org/wiki/Transmission_Control_Protocol)
-[![TCP Socket](https://img.shields.io/badge/TCP%20Socket-00599C?style=for-the-badge&logo=wireshark&logoColor=white)](https://www.geeksforgeeks.org/socket-programming-in-java/)
 [![Swing](https://img.shields.io/badge/Java%20Swing-007396?style=for-the-badge&logo=java&logoColor=white)](https://docs.oracle.com/javase/tutorial/uiswing/)  
 [![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/) 
 [![JDBC](https://img.shields.io/badge/JDBC%20Connector-CC0000?style=for-the-badge&logo=java&logoColor=white)](https://dev.mysql.com/downloads/connector/j/) 
