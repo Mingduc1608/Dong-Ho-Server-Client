@@ -21,7 +21,7 @@
 
 ## 📖 1. Giới thiệu hệ thống 
 
-📌 Đây là một ứng dụng Java mô phỏng hệ thống đồng hồ đồng bộ thời gian. Ngoài ra, còn có các chức năng như báo thức (Alarm), hẹn  và đồng hồ bấm giờ (Stopwatch), kèm theo chức năng Client-Server để trao đổi dữ liệu qua giao thức TCP.
+📌 Đây là một ứng dụng Java mô phỏng hệ thống đồng hồ đồng bộ thời gian. Ngoài ra, còn có các chức năng như báo thức (Alarm), hẹn  và đồng hồ bấm giờ (Stopwatch), kèm theo chức năng Client-Server để trao đổi dữ liệu qua giao thức UDP.
 
 📌 Ứng dụng được xây dựng với giao diện đồ họa (Java Swing) nhằm giúp người dùng quản lý thời gian và kiểm thử chức năng truyền thông mạng.
     
@@ -39,7 +39,7 @@
 
 🖥️ ClientApp (Client):
 
-👉 Kết nối đến server thông qua địa chỉ IP và cổng TCP.
+👉 Kết nối đến server thông qua địa chỉ IP và cổng UDP.
 
 👉 Gửi yêu cầu (vd: tạo báo thức, xem danh sách báo thức, gửi kết quả stopwatch).
 
