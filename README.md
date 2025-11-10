@@ -70,25 +70,28 @@
 ## 3. Một số hình ảnh của hệ thống
 
  🖥️ Giao diện Server
-![Server GUI](docs/Server.png)
+<img width="1213" height="769" alt="Server" src="https://github.com/user-attachments/assets/129c8938-45bd-4c88-ab61-03c026928659" />
+
 
 🖥️ Giao diện Client
-![Client GUI](docs/Client.png)
+<img width="1214" height="766" alt="Client" src="https://github.com/user-attachments/assets/050b7b45-1b5d-4efd-83f1-0bfa71a27455" />
+
 
 🔄 Giao diện đồng hồ Đồng bộ hóa  
-![Sync](docs/Sync.png)
+<img width="1919" height="1079" alt="Sync" src="https://github.com/user-attachments/assets/fa6e8159-b0e9-43ee-95e3-f0b6b1d5d0af" />
 
 📊 Bảng dữ liệu trong MySQL (sync_log)
 ![Runs Table](docs/TableMySQL.png)
 
 ⏱️ Giao diện đồng hồ hẹn giờ  
-![TimerFrame](docs/TimerFrame.png)
+<img width="1013" height="693" alt="TimerFrame" src="https://github.com/user-attachments/assets/55a95d84-6af7-482c-aa0e-c7f65452a083" />
+
 
 👥 Giao diện khi hẹn giờ xong  
 ![FrameClock](docs/FrameClock.png)
 
 ⏰ Giao diện đồng hồ báo thức  
-![Alarm GUI](docs/Alarm.png)
+<img width="1111" height="641" alt="Alarm" src="https://github.com/user-attachments/assets/7b4c2718-5278-468e-91da-d1e38f4f7a7e" />
 
 🕒 Giao diện đồng hồ bấm giờ  
 ![StopClock](docs/StopClock.png)
