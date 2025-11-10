@@ -21,7 +21,7 @@
 
 ## 📖 1. Giới thiệu hệ thống 
 
-📌 Đây là một ứng dụng Java mô phỏng hệ thống đồng hồ đồng bộ thời gian. Ngoài ra, còn có các chức năng như báo thức (Alarm), hẹn  và đồng hồ bấm giờ (Stopwatch), kèm theo chức năng Client-Server để trao đổi dữ liệu qua giao thức TCP.
+📌 Đây là một ứng dụng Java mô phỏng hệ thống đồng hồ đồng bộ thời gian. Ngoài ra, còn có các chức năng như báo thức (Alarm), hẹn  và đồng hồ bấm giờ (Stopwatch), kèm theo chức năng Client-Server để trao đổi dữ liệu qua giao thức UDP.
 
 📌 Ứng dụng được xây dựng với giao diện đồ họa (Java Swing) nhằm giúp người dùng quản lý thời gian và kiểm thử chức năng truyền thông mạng.
     
@@ -39,7 +39,7 @@
 
 🖥️ ClientApp (Client):
 
-👉 Kết nối đến server thông qua địa chỉ IP và cổng TCP.
+👉 Kết nối đến server thông qua địa chỉ IP và cổng UDP.
 
 👉 Gửi yêu cầu (vd: tạo báo thức, xem danh sách báo thức, gửi kết quả stopwatch).
 
@@ -58,8 +58,6 @@
 ## 2. Công nghệ sử dụng
 
 [![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/technologies/javase-downloads.html) 
-[![TCP](https://img.shields.io/badge/TCP-0088CC?style=for-the-badge&logo=socketdotio&logoColor=white)](https://en.wikipedia.org/wiki/Transmission_Control_Protocol)
-[![TCP Socket](https://img.shields.io/badge/TCP%20Socket-00599C?style=for-the-badge&logo=wireshark&logoColor=white)](https://www.geeksforgeeks.org/socket-programming-in-java/)
 [![Swing](https://img.shields.io/badge/Java%20Swing-007396?style=for-the-badge&logo=java&logoColor=white)](https://docs.oracle.com/javase/tutorial/uiswing/)  
 [![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/) 
 [![JDBC](https://img.shields.io/badge/JDBC%20Connector-CC0000?style=for-the-badge&logo=java&logoColor=white)](https://dev.mysql.com/downloads/connector/j/) 
@@ -142,7 +140,7 @@
 👉  Ở giao diện ClientApp → nhấn Báo thức / Hẹn Giờ / Bấm giờ      
 
 
-Contact me:
+## 5. Contact me
 
     Nguyễn Minh Đức CNTT 16-01
 
