@@ -108,8 +108,8 @@ class ServerFrame extends JFrame {
 
  private void startServer() {
      appendLog("[Start] Server Startting...");
-     int port = 9876; // UDP port - bạn có thể đổi
-     // DB params - hãy chỉnh theo máy bạn
+     int port = 3306; // UDP port - bạn có thể đổi
+     // DB 
      String url = "jdbc:mysql://localhost:3306/clock_sync?useSSL=false&serverTimezone=UTC";
      String user = "root";
      String pass = "root120204";
@@ -139,110 +139,110 @@ class ServerFrame extends JFrame {
 
 /* ---------- ClockPanel (analog + digital) ---------- */
 class ClockPanel extends JPanel {
- private BufferedImage clockImage;
- private JLabel digitalLabel;
- private Timer timer;
- private long adjustmentOffset = 0; // +/- ms for sync adjustment (if needed)
+    private JLabel digitalLabel;
+    private Timer timer;
+    private long adjustmentOffset = 0; // +/- ms for sync adjustment (if needed)
 
- public ClockPanel() {
-     setBackground(Color.WHITE);
-     setPreferredSize(new Dimension(320, 480));
-     digitalLabel = new JLabel("00:00:00");
-     digitalLabel.setFont(new Font("Monospaced", Font.BOLD, 20));
-     digitalLabel.setOpaque(true);
-     digitalLabel.setBackground(new Color(80, 140, 255));
-     digitalLabel.setForeground(Color.YELLOW);
-     digitalLabel.setPreferredSize(new Dimension(160, 40));
-     digitalLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    public ClockPanel() {
+        setBackground(Color.WHITE);
+        setPreferredSize(new Dimension(320, 480));
 
-     // load clock image from resources/clock.png if exists
-     try {
-         clockImage = javax.imageio.ImageIO.read(new File("resources/clock.png"));
-     } catch (Exception ex) {
-         clockImage = null;
-     }
+        digitalLabel = new JLabel("00:00:00");
+        digitalLabel.setFont(new Font("Monospaced", Font.BOLD, 20));
+        digitalLabel.setOpaque(true);
+        digitalLabel.setBackground(new Color(80, 140, 255));
+        digitalLabel.setForeground(Color.YELLOW);
+        digitalLabel.setPreferredSize(new Dimension(160, 40));
+        digitalLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-     timer = new Timer(1000, e -> repaint());
-     timer.start();
- }
+        timer = new Timer(1000, e -> repaint());
+        timer.start();
+    }
 
- public JLabel getDigitalLabel() {
-     return digitalLabel;
- }
+    public JLabel getDigitalLabel() {
+        return digitalLabel;
+    }
 
- public void setAdjustmentOffset(long ms) {
-     this.adjustmentOffset = ms;
- }
+    public void setAdjustmentOffset(long ms) {
+        this.adjustmentOffset = ms;
+    }
 
- @Override
- protected void paintComponent(Graphics g) {
-     super.paintComponent(g);
-     // draw analog clock
-     int w = getWidth(), h = getHeight() - 60;
-     Graphics2D g2 = (Graphics2D) g.create();
-     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        int w = getWidth(), h = getHeight() - 60;
+        Graphics2D g2 = (Graphics2D) g.create();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-     int size = Math.min(w, h) - 40;
-     int cx = (w / 2);
-     int cy = (h / 2) - 10;
-     int r = size / 2;
+        int size = Math.min(w, h) - 80;
+        int cx = (w / 2);
+        int cy = (h / 2) - 10;
+        int r = size / 2;
 
-     if (clockImage != null) {
-         g2.drawImage(clockImage, cx - r, cy - r, size, size, null);
-     } else {
-         // draw simple clock
-         g2.setColor(new Color(206, 244, 206));
-         g2.fillOval(cx - r, cy - r, 2*r, 2*r);
-         g2.setColor(Color.GRAY);
-         g2.setStroke(new BasicStroke(3f));
-         g2.drawOval(cx - r, cy - r, 2*r, 2*r);
+        // --------- Vẽ mặt đồng hồ ---------
+        g2.setColor(Color.WHITE);
+        g2.fillOval(cx - r, cy - r, 2 * r, 2 * r);
+        g2.setColor(Color.BLACK);
+        g2.setStroke(new BasicStroke(4f));
+        g2.drawOval(cx - r, cy - r, 2 * r, 2 * r);
 
-         // draw ticks
-         for (int i=0;i<12;i++) {
-             double ang = Math.toRadians(i * 30);
-             int x1 = cx + (int)(Math.cos(ang) * (r-8));
-             int y1 = cy + (int)(Math.sin(ang) * (r-8));
-             int x2 = cx + (int)(Math.cos(ang) * (r-20));
-             int y2 = cy + (int)(Math.sin(ang) * (r-20));
-             g2.drawLine(x1,y1,x2,y2);
-         }
-     }
+        // --------- Vẽ số 1–12 ---------
+        g2.setFont(new Font("Arial", Font.BOLD, 16));
+        for (int i = 1; i <= 12; i++) {
+            double ang = Math.toRadians(i * 30 - 90);
+            int tx = cx + (int) (Math.cos(ang) * (r - 25));
+            int ty = cy + (int) (Math.sin(ang) * (r - 25));
+            String num = String.valueOf(i);
+            FontMetrics fm = g2.getFontMetrics();
+            int tw = fm.stringWidth(num);
+            int th = fm.getAscent();
+            g2.drawString(num, tx - tw / 2, ty + th / 3);
+        }
 
-     // draw hands
-     long now = System.currentTimeMillis() + adjustmentOffset;
-     Date d = new Date(now);
-     java.util.Calendar cal = java.util.Calendar.getInstance();
-     cal.setTime(d);
-     int sec = cal.get(java.util.Calendar.SECOND);
-     int min = cal.get(java.util.Calendar.MINUTE);
-     int hour = cal.get(java.util.Calendar.HOUR);
+        // --------- Vẽ mặt cười ---------
+        g2.fillOval(cx - 15, cy - 20, 10, 15); // mắt trái
+        g2.fillOval(cx + 5, cy - 20, 10, 15);  // mắt phải
+        g2.drawArc(cx - 25, cy - 5, 50, 30, 200, 140); // miệng cười
 
-     double secAng = Math.toRadians((sec/60.0)*360 - 90);
-     double minAng = Math.toRadians((min/60.0)*360 + (sec/60.0)*6 - 90);
-     double hourAng = Math.toRadians((hour/12.0)*360 + (min/60.0)*30 - 90);
+        // --------- Kim đồng hồ ---------
+        long now = System.currentTimeMillis() + adjustmentOffset;
+        Date d = new Date(now);
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.setTime(d);
+        int sec = cal.get(java.util.Calendar.SECOND);
+        int min = cal.get(java.util.Calendar.MINUTE);
+        int hour = cal.get(java.util.Calendar.HOUR);
 
-     int lenHour = r - 60;
-     int lenMin = r - 30;
-     int lenSec = r - 20;
+        double secAng = Math.toRadians((sec / 60.0) * 360 - 90);
+        double minAng = Math.toRadians((min / 60.0) * 360 + (sec / 60.0) * 6 - 90);
+        double hourAng = Math.toRadians((hour / 12.0) * 360 + (min / 60.0) * 30 - 90);
 
-     g2.setStroke(new BasicStroke(6f));
-     g2.setColor(new Color(50,50,50));
-     g2.drawLine(cx,cy, cx + (int)(Math.cos(hourAng)*lenHour), cy + (int)(Math.sin(hourAng)*lenHour));
+        int lenHour = r - 70;
+        int lenMin = r - 50;
+        int lenSec = r - 40;
 
-     g2.setStroke(new BasicStroke(4f));
-     g2.drawLine(cx,cy, cx + (int)(Math.cos(minAng)*lenMin), cy + (int)(Math.sin(minAng)*lenMin));
+        // Kim giờ
+        g2.setStroke(new BasicStroke(6f));
+        g2.setColor(Color.BLACK);
+        g2.drawLine(cx, cy, cx + (int) (Math.cos(hourAng) * lenHour), cy + (int) (Math.sin(hourAng) * lenHour));
 
-     g2.setStroke(new BasicStroke(2f));
-     g2.setColor(Color.RED);
-     g2.drawLine(cx,cy, cx + (int)(Math.cos(secAng)*lenSec), cy + (int)(Math.sin(secAng)*lenSec));
+        // Kim phút
+        g2.setStroke(new BasicStroke(4f));
+        g2.drawLine(cx, cy, cx + (int) (Math.cos(minAng) * lenMin), cy + (int) (Math.sin(minAng) * lenMin));
 
-     g2.dispose();
+        // Kim giây
+        g2.setStroke(new BasicStroke(2f));
+        g2.setColor(Color.RED);
+        g2.drawLine(cx, cy, cx + (int) (Math.cos(secAng) * lenSec), cy + (int) (Math.sin(secAng) * lenSec));
 
-     // update digital label
-     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-     digitalLabel.setText(sdf.format(new Date(now)));
- }
+        g2.dispose();
+
+        // --------- Cập nhật đồng hồ số ---------
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        digitalLabel.setText(sdf.format(new Date(now)));
+    }
 }
+
 
 /* ---------- UDPServer (background thread) ---------- */
 class UDPServer {

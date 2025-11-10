@@ -1,5 +1,6 @@
 package udb;
 
+import java.net.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -66,7 +67,21 @@ public class AlarmFrame extends JFrame {
         Timer timer = new Timer(1000, e -> checkAlarms());
         timer.start();
     }
-    
+ // Gửi thông báo qua UDP khi báo thức kích hoạt
+    private void sendUDPMessage(String message, String ip, int port) {
+        try {
+            DatagramSocket socket = new DatagramSocket();
+            byte[] buf = message.getBytes();
+            InetAddress address = InetAddress.getByName(ip);
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, address, port);
+            socket.send(packet);
+            socket.close();
+            System.out.println("Đã gửi UDP: " + message);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
  // Hàm kiểm tra báo thức
     private void checkAlarms() {
         java.time.LocalTime now = java.time.LocalTime.now();
@@ -101,7 +116,9 @@ public class AlarmFrame extends JFrame {
     }
  // Hàm xử lý khi báo thức kêu
     private void triggerAlarm(Alarm a) {
-        // Hiện popup
+    	// Gửi tín hiệu báo thức qua UDP
+        sendUDPMessage("ALARM_TRIGGERED " + a.time + " " + a.days, "127.0.0.1", 3306);
+    	// Hiện popup
         JOptionPane.showMessageDialog(this,
             "Đến giờ báo thức: " + a.time + "\n" + a.days,
             "BÁO THỨC!",
@@ -244,6 +261,7 @@ public class AlarmFrame extends JFrame {
     }
 
     // Single row UI for an alarm
+ // Single row UI for an alarm
     private class AlarmRow extends JPanel {
         private final Alarm alarm;
         private final JLabel timeLabel;
@@ -276,10 +294,14 @@ public class AlarmFrame extends JFrame {
             c.weightx = 0.4;
             add(daysLabel, c);
 
-            // Ringtone button
+            // Ringtone button (màu xanh ngọc)
             ringtoneBtn = new JButton(alarm.ringtone == null ? "Chọn nhạc chuông" : alarm.ringtone.getName());
             ringtoneBtn.setPreferredSize(new Dimension(180, 50));
             ringtoneBtn.setFocusPainted(false);
+            ringtoneBtn.setOpaque(true);
+            ringtoneBtn.setBorderPainted(false);
+            ringtoneBtn.setBackground(new Color(0, 191, 165)); // xanh ngọc
+            ringtoneBtn.setForeground(Color.WHITE);
             c.gridx = 2; c.gridy = 0;
             c.weightx = 0.2;
             add(ringtoneBtn, c);
@@ -307,13 +329,28 @@ public class AlarmFrame extends JFrame {
                 updateToggleColor();
             });
             
-         // Delete button
+            // Edit button (màu cam)
+            editBtn = new JButton("Sửa");
+            editBtn.setPreferredSize(new Dimension(100, 50));
+            editBtn.setOpaque(true);
+            editBtn.setBorderPainted(false);
+            editBtn.setBackground(new Color(255, 140, 0)); // cam
+            editBtn.setForeground(Color.WHITE);
+            c.gridx = 4; c.gridy = 0;
+            c.weightx = 0;
+            add(editBtn, c);
+            editBtn.addActionListener(e -> addAlarmDialog(alarm));
+
+            // Delete button (màu đỏ)
             deleteBtn = new JButton("Xóa");
             deleteBtn.setPreferredSize(new Dimension(100, 50));
-            c.gridx = 5; c.gridy = 0;   // đặt sau nút Sửa
+            deleteBtn.setOpaque(true);
+            deleteBtn.setBorderPainted(false);
+            deleteBtn.setBackground(new Color(220, 20, 60)); // đỏ tươi
+            deleteBtn.setForeground(Color.WHITE);
+            c.gridx = 5; c.gridy = 0;
             c.weightx = 0;
             add(deleteBtn, c);
-
             deleteBtn.addActionListener(e -> {
                 int confirm = JOptionPane.showConfirmDialog(
                         AlarmFrame.this,
@@ -325,18 +362,6 @@ public class AlarmFrame extends JFrame {
                     alarms.remove(alarm);
                     refreshList();
                 }
-            });
-
-
-            // Edit button
-            editBtn = new JButton("Sửa");
-            editBtn.setPreferredSize(new Dimension(100, 50));
-            c.gridx = 4; c.gridy = 0;
-            c.weightx = 0;
-            add(editBtn, c);
-            editBtn.addActionListener(e -> {
-                // Show edit dialog
-                addAlarmDialog(alarm);
             });
         }
 
@@ -350,7 +375,7 @@ public class AlarmFrame extends JFrame {
             }
         }
     }
-    
+
     
 
     // For quick testing when running this class directly

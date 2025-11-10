@@ -6,6 +6,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
 
 public class StopwatchFrame extends JFrame {
     private final JLabel timeLabel;
@@ -97,14 +101,19 @@ public class StopwatchFrame extends JFrame {
                 tableModel.setRowCount(0); // clear bảng
                 startLapBtn.setText("Lap"); // chuyển chức năng
                 stopBtn.setEnabled(true);
+             // Gửi UDP thông báo Start
+                sendUDPMessage("START", "127.0.0.1", 3306);
             } else {
                 // Đang chạy -> ghi lap
                 long now = System.currentTimeMillis();
                 long elapsed = now - startTimeMillis + pausedOffset;
                 laps.add(elapsed);
+                String lapMsg = "LAP:" + formatTime(elapsed);
                 tableModel.addRow(new Object[]{"Lượt " + laps.size(), formatTime(elapsed)});
                 // scroll xuống dưới
                 lapTable.scrollRectToVisible(lapTable.getCellRect(tableModel.getRowCount() - 1, 0, true));
+             // Gửi UDP thông báo Lap
+                sendUDPMessage(lapMsg, "127.0.0.1", 3306);
             }
         });
 
@@ -114,6 +123,8 @@ public class StopwatchFrame extends JFrame {
                 running = false;
                 startLapBtn.setText("Start");
                 stopBtn.setEnabled(false);
+                // Gửi UDP thông báo Stop
+                sendUDPMessage("STOP", "127.0.0.1", 3306);
             }
         });
 
@@ -124,6 +135,18 @@ public class StopwatchFrame extends JFrame {
                 timeLabel.setFont(timeLabel.getFont().deriveFont(Math.max(28f, getHeight() / 10f)));
             }
         });
+    }
+    private void sendUDPMessage(String message, String ip, int port) {
+        try {
+            DatagramSocket socket = new DatagramSocket();
+            byte[] buffer = message.getBytes();
+            InetAddress address = InetAddress.getByName(ip);
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, address, port);
+            socket.send(packet);
+            socket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // Helper: format milliseconds -> HH:mm:ss,cc (cc = centiseconds)

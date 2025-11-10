@@ -1,6 +1,5 @@
 package udb;
 
-//ClientApp.java
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
@@ -182,7 +181,7 @@ class SyncFrame extends JFrame {
      c.gridx=1; config.add(tfIP, c);
 
      c.gridx=0;c.gridy=1; config.add(new JLabel("Port:"), c);
-     tfPort = new JTextField("9876", 6);
+     tfPort = new JTextField("3306", 6);
      c.gridx=1; config.add(tfPort, c);
 
      c.gridx=0;c.gridy=2; config.add(new JLabel("Samples:"), c);
@@ -374,10 +373,13 @@ class TimerFrame extends JFrame {
         addBtn.setFont(new Font("Arial", Font.BOLD, 28));
         addBtn.setPreferredSize(new Dimension(60,60));
         addBtn.addActionListener(e -> {
-            AddEditDialog d = new AddEditDialog(this, 0); // thêm mới
+            AddEditDialog d = new AddEditDialog(this, 0);
             Integer secs = d.showDialog();
             if (secs != null && secs > 0) addTimer(secs);
         });
+
+        // ✅ Style cho nút "+"
+        styleButton(addBtn, new Color(130,245,160), new Color(55,200,120), Color.BLACK);
         top.add(addBtn, BorderLayout.EAST);
         add(top, BorderLayout.NORTH);
 
@@ -386,12 +388,8 @@ class TimerFrame extends JFrame {
         JScrollPane sp = new JScrollPane(listPanel);
         add(sp, BorderLayout.CENTER);
 
-        // Start swing timer (tick 1s)
         tickTimer = new javax.swing.Timer(1000, e -> tickAll());
         tickTimer.start();
-
-        // sample: (bỏ nếu không muốn khởi tạo ví dụ)
-        // addTimer(10); addTimer(20); addTimer(60); addTimer(3600);
     }
 
     private void addTimer(int seconds) {
@@ -416,56 +414,88 @@ class TimerFrame extends JFrame {
                 r.item.decrement();
                 r.updateLabels();
                 if (r.item.getRemainingSeconds() <= 0) {
-                    // đạt 0 -> stop và hiện popup
                     r.item.setActive(false);
                     r.updateToggle();
                     AlarmPopup.showMessage();
                 }
             } else {
-                r.updateLabels(); // luôn cập nhật nhãn
+                r.updateLabels();
             }
         }
+    }
+
+    /* ✅ Hàm STYLE BUTTON hiện đại */
+    private void styleButton(AbstractButton btn, Color c1, Color c2, Color text) {
+        btn.setFocusPainted(false);
+        btn.setForeground(text);
+        btn.setFont(new Font("Arial", Font.BOLD, 16));
+        btn.setBorder(BorderFactory.createEmptyBorder(8,18,8,18));
+        btn.setContentAreaFilled(false);
+
+        btn.setUI(new javax.swing.plaf.basic.BasicButtonUI() {
+            @Override
+            public void paint(Graphics g, JComponent c) {
+                Graphics2D g2 = (Graphics2D) g;
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                int w = c.getWidth();
+                int h = c.getHeight();
+                GradientPaint gp = new GradientPaint(0,0,c1,0,h,c2);
+                g2.setPaint(gp);
+                g2.fillRoundRect(0,0,w,h,18,18);
+                super.paint(g2, c);
+            }
+        });
+
+        btn.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btn.setForeground(Color.WHITE);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btn.setForeground(text);
+            }
+        });
     }
 
     // ---- dòng từng hẹn giờ ----
     class TimerRow extends JPanel {
         TimerItem item;
-        JLabel timeLabel;
-        JLabel descLabel;
+        JLabel timeLabel, descLabel;
         JToggleButton toggle;
         JButton btnEdit, btnDelete;
 
         public TimerRow(TimerItem item) {
             this.item = item;
             setLayout(new BorderLayout());
-            setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY,1,true));
             setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
             setPreferredSize(new Dimension(760, 100));
 
-            // left: time big
             JPanel left = new JPanel(new BorderLayout());
             left.setPreferredSize(new Dimension(180, 100));
+
             timeLabel = new JLabel(item.formatRemaining(), SwingConstants.CENTER);
-            timeLabel.setFont(new Font("Arial", Font.PLAIN, 34));
-            left.add(timeLabel, BorderLayout.CENTER);
+            timeLabel.setFont(new Font("Arial", Font.BOLD, 34));
             descLabel = new JLabel(item.humanDescription(), SwingConstants.CENTER);
             descLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+
+            left.add(timeLabel, BorderLayout.CENTER);
             left.add(descLabel, BorderLayout.SOUTH);
 
-            // center: toggle image placeholder
             JPanel center = new JPanel();
             center.setPreferredSize(new Dimension(160,100));
-            toggle = new JToggleButton("OFF");
+
+            toggle = new JToggleButton(item.isActive() ? "ON" : "OFF");
             toggle.setPreferredSize(new Dimension(120, 45));
             toggle.addActionListener(e -> {
-                boolean sel = toggle.isSelected();
-                item.setActive(sel);
+                item.setActive(toggle.isSelected());
                 updateToggle();
             });
-            updateToggle();
+
+            // ✅ Style ON/OFF
+            styleButton(toggle, new Color(180,220,255), new Color(100,160,245), Color.BLACK);
+
             center.add(toggle);
 
-            // right: buttons Sửa / Xóa
             JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 20, 20));
             btnEdit = new JButton("Sửa");
             btnEdit.setPreferredSize(new Dimension(100, 45));
@@ -478,12 +508,15 @@ class TimerFrame extends JFrame {
                     updateLabels();
                 }
             });
+
             btnDelete = new JButton("Xóa");
             btnDelete.setPreferredSize(new Dimension(100, 45));
-            btnDelete.addActionListener(e -> {
-                // xóa dòng
-                TimerFrame.this.removeRow(this);
-            });
+            btnDelete.addActionListener(e -> TimerFrame.this.removeRow(this));
+
+            // ✅ Style Sửa / Xóa
+            styleButton(btnEdit, new Color(255,245,160), new Color(255,215,80), Color.BLACK);
+            styleButton(btnDelete, new Color(255,180,180), new Color(255,100,100), Color.BLACK);
+
             right.add(btnEdit);
             right.add(btnDelete);
 
@@ -498,16 +531,12 @@ class TimerFrame extends JFrame {
         }
 
         void updateToggle() {
-            if (item.isActive()) {
-                toggle.setText("ON");
-                toggle.setSelected(true);
-            } else {
-                toggle.setText("OFF");
-                toggle.setSelected(false);
-            }
+            toggle.setText(item.isActive() ? "ON" : "OFF");
+            toggle.setSelected(item.isActive());
         }
     }
 }
+
 
 /* ---- model timer item ---- */
 class TimerItem {
@@ -612,7 +641,6 @@ class AddEditDialog extends JDialog {
 /* ---- Alarm popup ---- */
 class AlarmPopup {
     public static void showMessage() {
-        // hiển thị trên EDT
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("ĐỒNG HỒ SERVER ĐỒNG BỘ HÓA");
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -620,14 +648,20 @@ class AlarmPopup {
             frame.setLocationRelativeTo(null);
             frame.setAlwaysOnTop(true);
 
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.setBackground(Color.WHITE);
+
             JLabel label = new JLabel("Thầy Lê Tuấn Anh Đáng Yêu <3", SwingConstants.CENTER);
-            label.setFont(new Font("Arial", Font.BOLD, 48));
-            label.setForeground(new Color(81,170,30)); // màu xanh như hình
-            frame.add(label);
+            label.setFont(new Font("Arial", Font.BOLD, 56));
+            label.setForeground(new Color(81,170,30)); 
+            panel.add(label, BorderLayout.CENTER);
+
+            frame.setContentPane(panel);
             frame.setVisible(true);
         });
     }
 }
+
 
 /* ---------- UDPClient (simple request/response) ---------- */
 class UDPClient {
